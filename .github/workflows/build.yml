@@ -1,0 +1,87 @@
+name: build-cal-images
+
+# Constrói as imagens do cal.diy e publica no GHCR.
+#
+# Por que este repositório existe: o calcom/cal.diy NÃO publica imagem
+# (0 tags no Docker Hub, conferido no registro). A imagem do upstream
+# calcom/cal.com existe, mas é AGPL — usá-la devolveria a licença que o
+# fork MIT existe para evitar.
+#
+# Por que não deixar a Railway construir: o Dockerfile pede 6 GB de heap
+# (a API pede 8), e a Railway precisa de integração OAuth pelo navegador
+# para construir a partir do GitHub. Runner do GitHub tem 16 GB e já está
+# aqui.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "commit ou tag do calcom/cal.diy"
+        default: "54343aa"
+      build_web:
+        description: "construir a imagem web"
+        type: boolean
+        default: true
+      build_api:
+        description: "construir a imagem da API v2"
+        type: boolean
+        default: true
+      api_v2_url:
+        description: "URL pública da API v2 (fica gravada no bundle; deixe vazio no primeiro build)"
+        default: ""
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Liberar disco no runner
+        # O build do cal enche os ~14 GB livres do runner. Isto devolve ~25 GB.
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h / | tail -1
+
+      - name: Baixar o cal.diy
+        uses: actions/checkout@v4
+        with:
+          repository: calcom/cal.diy
+          ref: ${{ inputs.ref }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Imagem web
+        if: ${{ inputs.build_web }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ghcr.io/hn-devs-mentoria/cal-web:${{ inputs.ref }},ghcr.io/hn-devs-mentoria/cal-web:latest
+          build-args: |
+            DATABASE_URL=${{ secrets.CAL_DATABASE_URL }}
+            NEXT_PUBLIC_API_V2_URL=${{ inputs.api_v2_url }}
+            CALCOM_TELEMETRY_DISABLED=1
+            NEXT_PUBLIC_LICENSE_CONSENT=agree
+            MAX_OLD_SPACE_SIZE=6144
+
+      - name: Imagem da API v2
+        if: ${{ inputs.build_api }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./apps/api/v2/Dockerfile
+          push: true
+          tags: ghcr.io/hn-devs-mentoria/cal-api:${{ inputs.ref }},ghcr.io/hn-devs-mentoria/cal-api:latest
+          build-args: |
+            DATABASE_URL=${{ secrets.CAL_DATABASE_URL }}
+            DATABASE_DIRECT_URL=${{ secrets.CAL_DATABASE_URL }}
