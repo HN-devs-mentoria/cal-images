@@ -16,8 +16,8 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: "commit ou tag do calcom/cal.diy"
-        default: "54343aa"
+        description: "SHA COMPLETO (40 chars), branch ou tag do calcom/cal.diy. SHA curto NÃO funciona: o actions/checkout o trata como nome de branch."
+        default: "54343aa685ae8f33159d2f485ec4a57bad5c574a"
       build_web:
         description: "construir a imagem web"
         type: boolean
