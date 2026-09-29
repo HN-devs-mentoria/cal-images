@@ -45,11 +45,28 @@ jobs:
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
           df -h / | tail -1
 
+      - name: Baixar este repositório (patches)
+        uses: actions/checkout@v4
+        with:
+          path: patch-repo
+
       - name: Baixar o cal.diy
         uses: actions/checkout@v4
         with:
           repository: calcom/cal.diy
           ref: ${{ inputs.ref }}
+          path: cal
+
+      - name: Posicionar o patch
+        run: cp -r patch-repo/patches patch && ls patch
+
+      - name: Aplicar o patch dos managed users
+        # O cal.diy deixou createNewUsersConnectToOrgIfExists como stub. Sem
+        # este patch os atoms não autenticam. O script falha em voz alta se o
+        # upstream mudar o stub — melhor quebrar o build do que publicar uma
+        # imagem em que a função sumiu em silêncio.
+        working-directory: cal
+        run: node ../patch/managed-users.mjs
 
       - uses: docker/setup-buildx-action@v3
 
@@ -63,8 +80,8 @@ jobs:
         if: ${{ inputs.build_web }}
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./cal
+          file: ./cal/Dockerfile
           push: true
           tags: ghcr.io/hn-devs-mentoria/cal-web:${{ inputs.ref }},ghcr.io/hn-devs-mentoria/cal-web:latest
           build-args: |
@@ -78,8 +95,8 @@ jobs:
         if: ${{ inputs.build_api }}
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./apps/api/v2/Dockerfile
+          context: ./cal
+          file: ./cal/apps/api/v2/Dockerfile
           push: true
           tags: ghcr.io/hn-devs-mentoria/cal-api:${{ inputs.ref }},ghcr.io/hn-devs-mentoria/cal-api:latest
           build-args: |
