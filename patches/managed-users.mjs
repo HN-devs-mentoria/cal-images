@@ -35,11 +35,12 @@ const IMPLEMENTACAO = `}): Promise<{ id: number; email: string; username: string
     creationSource,
   } = _args;
 
-  const { default: prisma } = await import("@calcom/prisma");
+  const prismaMod: any = await import("@calcom/prisma");
+  const prisma = prismaMod.default ?? prismaMod.prisma;
 
   // slugify local em vez de importado: menos superfície para quebrar quando o
   // upstream move arquivos.
-  const paraSlug = (texto) =>
+  const paraSlug = (texto: string): string =>
     (texto || "")
       .toLowerCase()
       .normalize("NFD")
@@ -49,9 +50,9 @@ const IMPLEMENTACAO = `}): Promise<{ id: number; email: string; username: string
       .replace(/^-|-$/g, "")
       .slice(0, 40) || "user";
 
-  const criados = [];
+  const criados: { id: number; email: string; username: string }[] = [];
 
-  for (const convite of invitations) {
+  for (const convite of invitations as { usernameOrEmail: string; role: any }[]) {
     const email = String(convite.usernameOrEmail).toLowerCase();
     const info = orgConnectInfoByUsernameOrEmail?.[convite.usernameOrEmail];
     const organizationId = info?.orgId ?? (isOrg ? teamId : parentId ?? undefined);
