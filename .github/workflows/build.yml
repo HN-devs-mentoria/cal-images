@@ -28,7 +28,10 @@ on:
         default: true
       api_v2_url:
         description: "URL pública da API v2 (fica gravada no bundle; deixe vazio no primeiro build)"
-        default: ""
+        default: "https://cal-api-production-5e79.up.railway.app"
+      webapp_url:
+        description: "URL pública do cal web, gravada no bundle."
+        default: "https://agenda-mentoria.henriqueniada.com.br"
 
 permissions:
   contents: read
@@ -87,6 +90,13 @@ jobs:
           build-args: |
             DATABASE_URL=${{ secrets.CAL_DATABASE_URL }}
             NEXT_PUBLIC_API_V2_URL=${{ inputs.api_v2_url }}
+            # Sem isto o bundle sai com localhost:3000 e o start.sh troca pela
+            # URL real no boot, dentro dos arquivos, sem mudar o nome deles.
+            # Como os chunks têm cache immutable de 1 ano, quem abriu o cal com
+            # a URL antiga continuava com ela (06/10: "Ver página pública" no
+            # domínio da Railway). Gravada no build, a URL muda o hash dos
+            # chunks e o navegador baixa de novo.
+            NEXT_PUBLIC_WEBAPP_URL=${{ inputs.webapp_url }}
             CALCOM_TELEMETRY_DISABLED=1
             NEXT_PUBLIC_LICENSE_CONSENT=agree
             MAX_OLD_SPACE_SIZE=6144
