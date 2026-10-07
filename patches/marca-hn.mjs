@@ -16,9 +16,12 @@ function exigir(arquivo) {
 // 1. "Sobrepor meu calendário": o slot renderOverlay do Booker some; os 3 botões de visualização ficam.
 trocar("apps/web/modules/bookings/components/Booker.tsx", "if (isEmbed) return null;", "if (isEmbed || true) return null;");
 
-// 2. Logo do login (/api/logo lê esse arquivo).
+// 2. Logo HN: /api/logo lê esse arquivo; o login tem "Cal.diy" escrito à mão num <h1>.
 exigir("apps/web/public/calcom-logo-white-word.svg");
 fs.copyFileSync(`${HN}/calcom-logo-white-word.svg`, "apps/web/public/calcom-logo-white-word.svg");
+trocar("apps/web/modules/auth/login-view.tsx",
+  '<h1 className="font-cal text-xl font-bold text-emphasis">Cal.diy</h1>',
+  '<h1><img src="/calcom-logo-white-word.svg" alt="Henrique Niada" className="mx-auto h-8 w-auto dark:invert" /></h1>');
 
 // 3. Fundo das páginas públicas.
 fs.mkdirSync("apps/web/public/hn", { recursive: true });
