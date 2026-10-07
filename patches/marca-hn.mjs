@@ -34,4 +34,10 @@ trocar(layout, 'import PageWrapper from "@components/PageWrapperAppDir";',
   'import HnFundoPublico from "@components/HnFundoPublico";\nimport PageWrapper from "@components/PageWrapperAppDir";');
 trocar(layout, "        {children}\n", "        <HnFundoPublico />\n        {children}\n");
 
+// 4. Nome do app (título "Login | H.Niada") e sem "Criar Conta": o Next grava NEXT_PUBLIC_* no build,
+//    e o Dockerfile não repassa esses dois — então entram como ENV no estágio builder.
+//    DISABLE_SIGNUP também fecha /signup e a API de cadastro no servidor; conta nova só pelo admin.
+trocar("Dockerfile", "ENV NEXT_PUBLIC_WEBAPP_URL=http://NEXT_PUBLIC_WEBAPP_URL_PLACEHOLDER \\\n",
+  'ENV NEXT_PUBLIC_APP_NAME="H.Niada" NEXT_PUBLIC_DISABLE_SIGNUP=true\nENV NEXT_PUBLIC_WEBAPP_URL=http://NEXT_PUBLIC_WEBAPP_URL_PLACEHOLDER \\\n');
+
 console.log("marca-hn: ok");
