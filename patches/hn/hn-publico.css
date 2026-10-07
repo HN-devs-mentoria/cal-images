@@ -1,0 +1,36 @@
+
+/* --- HN: fundo das páginas públicas (patch de cal-images) --- */
+/* .app-bg da Area-de-membros-v2 (app/globals.css) */
+html:has(.hn-fundo) { background-color: #02030a; }
+body:has(.hn-fundo) { background: transparent !important; }
+.hn-fundo {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+  background-color: #02030a;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.066'/%3E%3C/svg%3E"),
+    linear-gradient(100deg, transparent 0%, transparent 10%, rgb(24 110 250 / 0.22) 17%, transparent 26%, transparent 44%, rgb(14 74 200 / 0.13) 51%, transparent 59%, transparent 77%, rgb(26 116 255 / 0.22) 84%, transparent 92%, transparent 100%),
+    linear-gradient(82deg, transparent 4%, transparent 20%, rgb(12 62 184 / 0.12) 29%, transparent 40%, transparent 62%, rgb(18 88 226 / 0.12) 72%, transparent 84%, transparent 100%),
+    radial-gradient(70% 42% at 50% -10%, rgb(22 110 255 / 0.14), transparent 72%);
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+  background-size: 180px 180px, auto, auto, auto;
+  background-position: 0 0, center, center, center top;
+}
+/* emblema do .hero-main do dashboard admin (admin.module.css), no canto inferior direito */
+.hn-emblema {
+  position: absolute; right: 3vw; bottom: 3vh; width: 360px; height: 360px;
+  display: grid; place-items: center;
+}
+.hn-emblema::before {
+  content: ""; position: absolute; inset: 18%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(56,104,220,.42), rgba(40,70,170,.14) 55%, transparent 72%);
+  filter: blur(6px);
+}
+.hn-onda { position: absolute; border-radius: 50%; border: 1px solid rgba(90,140,255,.22); animation: hn-onda-k 6s ease-in-out infinite; }
+.hn-onda:nth-child(1) { inset: 24%; }
+.hn-onda:nth-child(2) { inset: 12%; border-color: rgba(90,140,255,.16); animation-delay: -2s; }
+.hn-onda:nth-child(3) { inset: 0; border-color: rgba(90,140,255,.10); animation-delay: -4s; }
+.hn-emblema img { position: relative; width: 42%; height: auto; filter: drop-shadow(0 0 22px rgba(70,130,255,.35)); animation: hn-flutua-k 7s ease-in-out infinite; }
+@media (max-width: 768px) { .hn-emblema { width: 220px; height: 220px; right: -40px; bottom: -40px; opacity: .6; } }
+@keyframes hn-onda-k { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.03); opacity: .6; } }
+@keyframes hn-flutua-k { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { .hn-onda, .hn-emblema img { animation: none; } }

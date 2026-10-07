@@ -71,6 +71,10 @@ jobs:
         working-directory: cal
         run: node ../patch/managed-users.mjs
 
+      - name: Marca HN (logo do login, fundo público, sem sobrepor calendário)
+        working-directory: cal
+        run: node ../patch/marca-hn.mjs
+
       - name: Trocar o favicon pelo da área de membros
         # Gerados de icon-origem.svg (app/icon.svg da Area-de-membros-v2).
         # Falha se o upstream renomear algum alvo — senão o favicon voltaria
