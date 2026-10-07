@@ -71,6 +71,19 @@ jobs:
         working-directory: cal
         run: node ../patch/managed-users.mjs
 
+      - name: Trocar o favicon pelo da área de membros
+        # Gerados de icon-origem.svg (app/icon.svg da Area-de-membros-v2).
+        # Falha se o upstream renomear algum alvo — senão o favicon voltaria
+        # a ser o do cal sem ninguém perceber.
+        working-directory: cal/apps/web
+        run: |
+          for f in ../../../patch/brand/*.png ../../../patch/brand/favicon.ico; do
+            alvo="public/$(basename "$f")"
+            test -f "$alvo" || { echo "alvo sumiu no upstream: $alvo"; exit 1; }
+            cp "$f" "$alvo"
+          done
+          if [ -f app/favicon.ico ]; then cp ../../../patch/brand/favicon.ico app/favicon.ico; fi
+
       - uses: docker/setup-buildx-action@v3
 
       - uses: docker/login-action@v3
