@@ -113,6 +113,10 @@ jobs:
             # NÃO invalida o cache (immutable, 1 ano) de quem já abriu o cal:
             # essa pessoa precisa limpar os dados do site uma vez.
             NEXT_PUBLIC_WEBAPP_URL=${{ inputs.webapp_url }}
+            # Links "termos" e "política de privacidade" do formulário de reserva
+            # (sem eles o cal aponta para cal.com/terms e cal.com/privacy).
+            NEXT_PUBLIC_WEBSITE_TERMS_URL=https://henriqueniada.com.br/termos
+            NEXT_PUBLIC_WEBSITE_PRIVACY_POLICY_URL=https://henriqueniada.com.br/politica
             CALCOM_TELEMETRY_DISABLED=1
             NEXT_PUBLIC_LICENSE_CONSENT=agree
             MAX_OLD_SPACE_SIZE=6144

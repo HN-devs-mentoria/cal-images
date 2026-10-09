@@ -40,4 +40,12 @@ trocar(layout, "        {children}\n", "        <HnFundoPublico />\n        {chi
 trocar("Dockerfile", "ENV NEXT_PUBLIC_WEBAPP_URL=http://NEXT_PUBLIC_WEBAPP_URL_PLACEHOLDER \\\n",
   'ENV NEXT_PUBLIC_APP_NAME="H.Niada" NEXT_PUBLIC_DISABLE_SIGNUP=true\nENV NEXT_PUBLIC_WEBAPP_URL=http://NEXT_PUBLIC_WEBAPP_URL_PLACEHOLDER \\\n');
 
+// 5. Página de reserva confirmada: sem o convite "Crie o seu próprio link para reservas"
+//    (o cadastro é fechado; o convite levaria a uma tela que recusa) e sem o aviso da
+//    política de spam do Google (assusta o mentorado e o "Resolver" leva ao cal.com).
+const confirmada = "apps/web/modules/bookings/views/bookings-single-view.tsx";
+trocar(confirmada, "{session === null && !(userIsOwner || props.hideBranding) && (",
+  "{false && session === null && !(userIsOwner || props.hideBranding) && (");
+trocar(confirmada, "{isGmail && !isFeedbackMode && (", "{false && isGmail && !isFeedbackMode && (");
+
 console.log("marca-hn: ok");
