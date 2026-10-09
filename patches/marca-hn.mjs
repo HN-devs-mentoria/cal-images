@@ -57,4 +57,12 @@ trocar(gcal, 'conferenceDataVersion: 1,\n          sendUpdates: "none",', 'confe
 trocar(gcal, 'sendNotifications: true,\n        sendUpdates: "none",', 'sendNotifications: true,\n        sendUpdates: "all",');
 trocar(gcal, 'sendNotifications: false,\n        sendUpdates: "none",', 'sendNotifications: false,\n        sendUpdates: "all",');
 
+// 7. Imagem base pelo espelho do Google: o Docker Hub limita download anônimo por IP
+//    e os runners do GitHub compartilham IP — o build falhava com 429 antes de começar.
+//    mirror.gcr.io/library/node:20 é a mesma imagem oficial, sem esse limite.
+const MIRROR = "mirror.gcr.io/library/node:20";
+trocar("Dockerfile", "FROM --platform=$BUILDPLATFORM node:20 AS builder", `FROM --platform=$BUILDPLATFORM ${MIRROR} AS builder`);
+trocar("Dockerfile", "FROM node:20 AS builder-two", `FROM ${MIRROR} AS builder-two`);
+trocar("Dockerfile", "FROM node:20 AS runner", `FROM ${MIRROR} AS runner`);
+
 console.log("marca-hn: ok");
