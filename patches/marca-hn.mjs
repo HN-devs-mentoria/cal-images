@@ -48,4 +48,13 @@ trocar(confirmada, "{session === null && !(userIsOwner || props.hideBranding) &&
   "{false && session === null && !(userIsOwner || props.hideBranding) && (");
 trocar(confirmada, "{isGmail && !isFeedbackMode && (", "{false && isGmail && !isFeedbackMode && (");
 
+// 6. Google Agenda: o próprio Google envia o convite ao convidado (criar, alterar,
+//    cancelar). O cal cria o evento com sendUpdates "none" porque espera mandar os
+//    próprios e-mails; sem SMTP ninguém avisava, e o Google só põe na agenda convite
+//    de remetente conhecido — o convidado ficava sem e-mail e sem compromisso.
+const gcal = "packages/app-store/googlecalendar/lib/CalendarService.ts";
+trocar(gcal, 'conferenceDataVersion: 1,\n          sendUpdates: "none",', 'conferenceDataVersion: 1,\n          sendUpdates: "all",');
+trocar(gcal, 'sendNotifications: true,\n        sendUpdates: "none",', 'sendNotifications: true,\n        sendUpdates: "all",');
+trocar(gcal, 'sendNotifications: false,\n        sendUpdates: "none",', 'sendNotifications: false,\n        sendUpdates: "all",');
+
 console.log("marca-hn: ok");
